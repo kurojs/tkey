@@ -1,4 +1,4 @@
-import { BNString, IModule, ITKeyApi, ShareStore } from "@tkey/common-types";
+import { IModule, ITKeyApi, ShareStore } from "@tkey/common-types";
 export declare const WEB_STORAGE_MODULE_NAME = "webStorage";
 declare class WebStorageModule implements IModule {
     moduleName: string;
@@ -8,7 +8,8 @@ declare class WebStorageModule implements IModule {
     setModuleReferences(tbSDK: ITKeyApi): void;
     initialize(): Promise<void>;
     storeDeviceShare(deviceShareStore: ShareStore): Promise<void>;
-    storeDeviceShareOnFileStorage(shareIndex: BNString): Promise<void>;
+    storeDeviceShareOnFileStorage(shareIndex: string): Promise<void>;
+    private getShareDescription;
     getDeviceShare(): Promise<ShareStore>;
     inputShareFromWebStorage(): Promise<void>;
     setFileStorageAccess(access: boolean): void;

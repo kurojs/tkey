@@ -95,6 +95,7 @@ class ThresholdKey implements ITKey {
       addReconstructKeyMiddleware: this.addReconstructKeyMiddleware.bind(this),
       addShareSerializationMiddleware: this.addShareSerializationMiddleware.bind(this),
       addShareDescription: this.addShareDescription.bind(this),
+      deleteShareDescription: this.deleteShareDescription.bind(this),
       generateNewShare: this.generateNewShare.bind(this),
       inputShareStore: this.inputShareStore.bind(this),
       inputShareStoreSafe: this.inputShareStoreSafe.bind(this),
