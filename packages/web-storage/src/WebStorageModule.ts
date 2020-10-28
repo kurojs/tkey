@@ -27,7 +27,9 @@ class WebStorageModule implements IModule {
   async initialize(): Promise<void> {}
 
   async storeDeviceShare(deviceShareStore: ShareStore): Promise<void> {
-    await storeShareOnLocalStorage(deviceShareStore);
+    const metadata = this.tbSDK.getMetadata();
+    const tkeypubx = metadata.pubKey.x.toString("hex");
+    await storeShareOnLocalStorage(deviceShareStore, tkeypubx);
     await this.tbSDK.addShareDescription(
       deviceShareStore.share.shareIndex.toString("hex"),
       JSON.stringify({ module: this.moduleName, userAgent: window.navigator.userAgent, dateAdded: Date.now(), savedOnFileStorage: false }),
@@ -62,14 +64,14 @@ class WebStorageModule implements IModule {
 
   async getDeviceShare(): Promise<ShareStore> {
     const metadata = this.tbSDK.getMetadata();
-    const polyID = metadata.getLatestPublicPolynomial().getPolynomialID();
+    const tkeypubx = metadata.pubKey.x.toString("hex");
     let shareStore: ShareStore;
     try {
-      shareStore = await getShareFromLocalStorage(polyID);
+      shareStore = await getShareFromLocalStorage(tkeypubx);
     } catch (localErr) {
       if (this.canUseFileStorage) {
         try {
-          shareStore = await getShareFromFileStorage(polyID);
+          shareStore = await getShareFromFileStorage(tkeypubx);
         } catch (fileErr) {
           if (fileErr?.message?.includes("storage quota")) {
             // User has denied access to storage. stop asking for every share
