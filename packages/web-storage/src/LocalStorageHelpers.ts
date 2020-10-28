@@ -1,4 +1,5 @@
 import { derivePubKeyXFromPolyID, ShareStore } from "@tkey/common-types";
+import bowser from "bowser";
 
 function storageAvailable(type: string): boolean {
   let storage: Storage;
@@ -45,3 +46,9 @@ export const getShareFromLocalStorage = async (polyID: string): Promise<ShareSto
   if (!foundFile) throw new Error("No Share exists in localStorage");
   return ShareStore.fromJSON(JSON.parse(foundFile));
 };
+
+export function areBrowsersEqual(oldBrowserUa: string, newBrowserUa: string): boolean {
+  const oldBrowser = bowser.parse(oldBrowserUa);
+  const newBrowser = bowser.parse(newBrowserUa);
+  return oldBrowser.browser.name === newBrowser.browser.name && oldBrowser.os.name === newBrowser.os.name;
+}

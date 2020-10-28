@@ -1,8 +1,8 @@
-import { BNString, IModule, ITKeyApi, prettyPrintError, ShareStore } from "@tkey/common-types";
+import { IModule, ITKeyApi, prettyPrintError, ShareStore } from "@tkey/common-types";
 import BN from "bn.js";
 
 import { getShareFromFileStorage, storeShareOnFileStorage } from "./FileStorageHelpers";
-import { getShareFromLocalStorage, storeShareOnLocalStorage } from "./LocalStorageHelpers";
+import { areBrowsersEqual, getShareFromLocalStorage, storeShareOnLocalStorage } from "./LocalStorageHelpers";
 
 export const WEB_STORAGE_MODULE_NAME = "webStorage";
 
@@ -30,14 +30,34 @@ class WebStorageModule implements IModule {
     await storeShareOnLocalStorage(deviceShareStore);
     await this.tbSDK.addShareDescription(
       deviceShareStore.share.shareIndex.toString("hex"),
-      JSON.stringify({ module: this.moduleName, userAgent: window.navigator.userAgent, dateAdded: Date.now() }),
+      JSON.stringify({ module: this.moduleName, userAgent: window.navigator.userAgent, dateAdded: Date.now(), savedOnFileStorage: false }),
       true
     );
   }
 
-  async storeDeviceShareOnFileStorage(shareIndex: BNString): Promise<void> {
+  async storeDeviceShareOnFileStorage(shareIndex: string): Promise<void> {
+    const currentShareDescription = this.getShareDescription(shareIndex);
+    if (!currentShareDescription) throw new Error("Invalid Share Description");
+    await this.tbSDK.deleteShareDescription(shareIndex, currentShareDescription, false);
+    await this.tbSDK.addShareDescription(
+      shareIndex,
+      JSON.stringify({ module: this.moduleName, userAgent: window.navigator.userAgent, dateAdded: Date.now(), savedOnFileStorage: true }),
+      true
+    );
     const shareStore = this.tbSDK.outputShareStore(new BN(shareIndex));
     return storeShareOnFileStorage(shareStore);
+  }
+
+  private getShareDescription(shareIndex: string) {
+    const metadata = this.tbSDK.getMetadata();
+    const shareDescriptionMap = metadata.getShareDescription();
+    const currentShareDescription = shareDescriptionMap[shareIndex].reduce((acc, x) => {
+      const parsed = JSON.parse(x);
+      let finalAcc = acc;
+      if (areBrowsersEqual(parsed.userAgent, window.navigator.userAgent) && parsed.module === this.moduleName) finalAcc = x;
+      return finalAcc;
+    }, "");
+    return currentShareDescription;
   }
 
   async getDeviceShare(): Promise<ShareStore> {
@@ -68,6 +88,10 @@ class WebStorageModule implements IModule {
     const latestShareDetails = await this.tbSDK.catchupToLatestShare(shareStore);
     if (shareStore.polynomialID !== latestShareDetails.latestShare.polynomialID) this.storeDeviceShare(latestShareDetails.latestShare);
     this.tbSDK.inputShareStore(latestShareDetails.latestShare);
+  }
+
+  setFileStorageAccess(access: boolean): void {
+    this.canUseFileStorage = access;
   }
 }
 

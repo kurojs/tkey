@@ -11,5 +11,6 @@ declare class WebStorageModule implements IModule {
     storeDeviceShareOnFileStorage(shareIndex: BNString): Promise<void>;
     getDeviceShare(): Promise<ShareStore>;
     inputShareFromWebStorage(): Promise<void>;
+    setFileStorageAccess(access: boolean): void;
 }
 export default WebStorageModule;

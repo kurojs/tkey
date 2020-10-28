@@ -212,6 +212,7 @@ export interface ITKeyApi {
   inputShareStoreSafe(shareStore: ShareStore): Promise<void>;
   setDeviceStorage(storeDeviceStorage: (deviceShareStore: ShareStore) => Promise<void>): void;
   addShareDescription(shareIndex: string, description: string, updateMetadata?: boolean): Promise<void>;
+  deleteShareDescription(shareIndex: string, description: string, updateMetadata?: boolean): Promise<void>;
   inputShareStore(shareStore: ShareStore): void;
   addRefreshMiddleware(
     moduleName: string,
