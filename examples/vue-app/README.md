@@ -8,8 +8,11 @@ yarn pack:lerna
 ```
 
 ## Project setup
+
+Update tkey packages' version in `package.json`.
+
 ```
-npm install:local
+npm run install:local
 npm install
 ```
 
