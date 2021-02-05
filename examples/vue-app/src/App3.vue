@@ -5,6 +5,7 @@
       <input type="text" v-model="input" placeholder="Input" />
     </div>
     <div :style="{ marginTop: '16px' }">
+      <button @click="getPublicKey">Get public key</button>
       <button @click="encrypt">Encrypt</button>
       <button @click="decrypt">Decrypt</button>
       <br />
@@ -16,6 +17,7 @@
 </template>
 
 <script>
+import { getPubKeyECC } from "@tkey/common-types";
 import BaseServiceProvider from "@tkey/service-provider-base";
 
 export default {
@@ -38,6 +40,9 @@ export default {
     async decrypt() {
       this.input = (await this.serviceProvider.decrypt(this.encryptedInput)).toString();
       this.console(this.input);
+    },
+    getPublicKey() {
+      this.console(getPubKeyECC(this.serviceProvider.postboxKey).toString("hex"));
     },
     console(output) {
       this.consoleOutput = typeof output === "string" ? output : JSON.stringify(output, null, 2);
