@@ -443,21 +443,21 @@ class ThresholdKey implements ITKey {
         this.metadata.setGeneralStoreDomain(moduleName, adjustedGeneralStore);
       }
     }
-    const newShareMetadataToPush = [];
-    const newShareStoreSharesToPush = newShareIndexes.map((shareIndex) => {
-      const me = this.metadata.clone();
-      newShareMetadataToPush.push(me);
-      return newShareStores[shareIndex].share.share;
-    });
+    // const newShareMetadataToPush = [];
+    // const newShareStoreSharesToPush = newShareIndexes.map((shareIndex) => {
+    //   const me = this.metadata.clone();
+    //   newShareMetadataToPush.push(me);
+    //   return newShareStores[shareIndex].share.share;
+    // });
 
-    const AuthMetadatas = this.generateAuthMetadata({ input: [...metadataToPush, ...newShareMetadataToPush] });
+    // const AuthMetadatas = this.generateAuthMetadata({ input: [...metadataToPush, ...newShareMetadataToPush] });
 
     // Combine Authmetadata and service provider ShareStore
-    await this.storageLayer.setMetadataStream({
-      input: [...AuthMetadatas, newShareStores["1"]],
-      privKey: [...sharesToPush, ...newShareStoreSharesToPush, undefined],
-      serviceProvider: this.serviceProvider,
-    });
+    // await this.storageLayer.setMetadataStream({
+    //   input: [...AuthMetadatas, newShareStores["1"]],
+    //   privKey: [...sharesToPush, ...newShareStoreSharesToPush, undefined],
+    //   serviceProvider: this.serviceProvider,
+    // });
 
     // set metadata for all new shares
     for (let index = 0; index < newShareIndexes.length; index += 1) {

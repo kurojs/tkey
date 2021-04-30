@@ -81,6 +81,24 @@ describe("tkey", function () {
       fail("key should be able to be reconstructed");
     }
   });
+
+  it.only("#should be able to reconstruct key when initializing a key", async function () {
+    const resp1 = await tb.initializeNewKey({ initializeModules: true });
+    console.log(tb.metadata);
+    await tb.syncShareMetadata();
+
+    const tb2 = new ThresholdKey({ serviceProvider: defaultSP, storageLayer: defaultSL });
+    console.log(await tb2.initialize());
+
+    tb2.inputShareStore(resp1.deviceShare);
+    const reconstructedKey = await tb2.reconstructKey();
+    console.log(reconstructedKey.privKey);
+
+    if (resp1.privKey.cmp(reconstructedKey.privKey) !== 0) {
+      fail("key should be able to be reconstructed");
+    }
+  });
+
   it("#should be able to reconstruct key when initializing a  with user input", async function () {
     let determinedShare = new BN(keccak256("user answer blublu").slice(2), "hex");
     determinedShare = determinedShare.umod(ecCurve.curve.n);
