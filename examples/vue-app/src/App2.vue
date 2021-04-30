@@ -17,10 +17,7 @@
     <div :style="{ marginTop: '16px' }">
       <h4>Login and resets</h4>
       <button v-if="!isMocked" @click="login">Login and initialize with Torus</button>
-      <button @click="initializeNewKey">Initialize new key</button>
-      <button @click="reconstructKey">Reconstuct key</button>
-      <button @click="getKeyDetails">Get key details</button>
-      <button @click="getSDKObject">Get SDK object</button>
+      <button @click="resetTkey">Reset tkey</button>
       <br />
     </div>
     <div id="console">
@@ -30,6 +27,8 @@
 </template>
 
 <script>
+/*eslint-env node, mocha */
+
 import ThresholdKey from "@tkey/default";
 import TorusStorageLayer from "@tkey/storage-layer-torus";
 import BaseServiceProvider from "@tkey/service-provider-base";
@@ -54,7 +53,7 @@ const HOSTED_SMS_PASSWORDLESS = "hosted_sms_passwordless";
 const AUTH_DOMAIN = "https://torus-test.auth0.com";
 const AGGREGATE_LOGIN = {
   aggregateVerifierType: "single_id_verifier",
-  verifierIdentifier: "tkey-google",
+  verifierIdentifier: "binance-google",
   subVerifierDetailsArray: [
     {
       clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
@@ -63,22 +62,40 @@ const AGGREGATE_LOGIN = {
     },
   ],
 };
+// const AGGREGATE_LOGIN = {
+//   aggregateVerifierType: "single_id_verifier",
+//   verifierIdentifier: "tkey-google",
+//   subVerifierDetailsArray: [
+//     {
+//       clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
+//       typeOfLogin: "google",
+//       verifier: "torus",
+//     },
+//   ],
+// };
 
 export default {
   name: "App",
   data() {
     return {
       consoleOutput: "",
-      isMocked: true,
+      isMocked: false,
       loginHint: "",
       selectedVerifier: "google",
       verifiers: {
         [GOOGLE]: {
-          name: "Google",
-          typeOfLogin: "google",
-          clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
-          verifier: "google-lrc",
+          name: 'google',
+          typeOfLogin: 'google',
+          clientId: '467606163324-fli122op7hro9uism3ug66vfnfvnpnjt.apps.googleusercontent.com',
+          verifier: 'binance',
+          verifierIdentifier: 'binance-google',
         },
+        // [GOOGLE]: {
+        //   name: "Google",
+        //   typeOfLogin: "google",
+        //   clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
+        //   verifier: "google-lrc",
+        // },
         [FACEBOOK]: { name: "Facebook", typeOfLogin: "facebook", clientId: "617201755556395", verifier: "facebook-lrc" },
         [REDDIT]: { name: "Reddit", typeOfLogin: "reddit", clientId: "YNsv1YtA_o66fA", verifier: "torus-reddit-test" },
         [TWITCH]: { name: "Twitch", typeOfLogin: "twitch", clientId: "f5and8beke76mzutmics0zu4gw10dj", verifier: "twitch-lrc" },
@@ -147,15 +164,14 @@ export default {
             directParams: {
               baseUrl: `${location.origin}/serviceworker`,
               enableLogging: true,
-              proxyContractAddress: "0x4023d2a0D330bF11426B12C6144Cfb96B7fa6183", // details for test net
-              network: "testnet", // details for test net
+              network: "mainnet", // details for test net
             },
           });
       if (!this.isMocked) {
         await serviceProvider.init({ skipSw: false });
       }
 
-      const storageLayer = new TorusStorageLayer({ hostUrl: "http://localhost:5051", serviceProvider });
+      const storageLayer = new TorusStorageLayer({ hostUrl: "https://metadata.tor.us", serviceProvider });
       const webStorage = new WebStorageModule();
 
       this.tKey = new ThresholdKey({
@@ -163,6 +179,25 @@ export default {
         storageLayer,
         modules: { webStorage },
       });
+    },
+    async resetTkey(){
+      if (this.isMocked) return;
+      if (!this.tKey) return;
+
+      const jwtParams = this.loginConnections[this.selectedVerifier] || {};
+      const { typeOfLogin, clientId, verifier } = this.verifiers[this.selectedVerifier];
+
+      await this.tKey.serviceProvider.triggerHybridAggregateLogin({
+        singleLogin: {
+          typeOfLogin,
+          verifier,
+          clientId,
+          jwtParams,
+        },
+        aggregateLoginParams: AGGREGATE_LOGIN,
+      });
+
+      await this.tkey.storageLayer.setMetadata({input: "", serviceProvider: this.tkey.serviceProvider})
     },
     async login() {
       if (this.isMocked) return;
@@ -181,42 +216,7 @@ export default {
         aggregateLoginParams: AGGREGATE_LOGIN,
       });
 
-      const details = await this.tKey.initialize();
-
-      let shareDescriptions = Object.assign({}, details.shareDescriptions);
-      Object.keys(shareDescriptions).map((key) => {
-        shareDescriptions[key] = shareDescriptions[key].map((it) => JSON.parse(it));
-      });
-
-      let priority = ["webStorage", "securityQuestions"];
-      shareDescriptions = Object.values(shareDescriptions)
-        .flatMap((x) => x)
-        .sort((a, b) => priority.indexOf(a.module) - priority.indexOf(b.module));
-
-      let requiredShares = details.requiredShares;
-      if (shareDescriptions.length === 0 && requiredShares > 0) {
-        throw new Error("No share descriptions available. New key assign might be required or contact support.");
-      }
-
-      while (requiredShares > 0 && shareDescriptions.length > 0) {
-        let curr = shareDescriptions.shift();
-        if (curr.module === "webStorage") {
-          try {
-            await this.tKey.modules.webStorage.inputShareFromWebStorage();
-            requiredShares--;
-          } catch (err) {
-            console.log("Couldn't find on device share.", err);
-          }
-        } else if (curr.module === "securityQuestions") {
-          throw new Error("Password required");
-        }
-
-        if (shareDescriptions.length === 0 && requiredShares > 0) {
-          throw new Error("New key assign is required.");
-        }
-      }
-
-      await this.reconstructKey();
+      await this.tkey.storageLayer.setMetadata({input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider})
     },
     async initializeNewKey() {
       this.console(await this.tKey.initializeNewKey({ initializeModules: true }));

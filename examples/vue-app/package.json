@@ -9,19 +9,19 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tkey/chrome-storage": "file:../../packages/chrome-storage/tkey-chrome-storage-v3.9.1.tgz",
-    "@tkey/common-types": "file:../../packages/common-types/tkey-common-types-v3.9.1.tgz",
-    "@tkey/core": "file:../../packages/core/tkey-core-v3.9.1.tgz",
-    "@tkey/default": "file:../../packages/default/tkey-default-v3.9.1.tgz",
-    "@tkey/private-keys": "file:../../packages/private-keys/tkey-private-keys-v3.9.1.tgz",
-    "@tkey/security-questions": "file:../../packages/security-questions/tkey-security-questions-v3.9.1.tgz",
-    "@tkey/seed-phrase": "file:../../packages/seed-phrase/tkey-seed-phrase-v3.9.1.tgz",
-    "@tkey/service-provider-base": "file:../../packages/service-provider-base/tkey-service-provider-base-v3.9.1.tgz",
-    "@tkey/service-provider-torus": "file:../../packages/service-provider-torus/tkey-service-provider-torus-v3.9.1.tgz",
-    "@tkey/share-serialization": "file:../../packages/share-serialization/tkey-share-serialization-v3.9.1.tgz",
-    "@tkey/share-transfer": "file:../../packages/share-transfer/tkey-share-transfer-v3.9.1.tgz",
-    "@tkey/storage-layer-torus": "file:../../packages/storage-layer-torus/tkey-storage-layer-torus-v3.9.1.tgz",
-    "@tkey/web-storage": "file:../../packages/web-storage/tkey-web-storage-v3.9.1.tgz",
+    "@tkey/chrome-storage": "3.14.1",
+    "@tkey/common-types": "3.14.1",
+    "@tkey/core": "3.14.1",
+    "@tkey/default": "3.14.1",
+    "@tkey/private-keys": "3.14.1",
+    "@tkey/security-questions": "3.14.1",
+    "@tkey/seed-phrase": "3.14.1",
+    "@tkey/service-provider-base": "3.14.1",
+    "@tkey/service-provider-torus": "3.14.1",
+    "@tkey/share-serialization": "3.14.1",
+    "@tkey/share-transfer": "3.14.1",
+    "@tkey/storage-layer-torus": "3.14.1",
+    "@tkey/web-storage": "3.14.1",
     "core-js": "^3.7.0",
     "vue": "^2.6.12"
   },
@@ -47,7 +47,10 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "no-console": 1,
+      "no-debugger": 1
+    }
   },
   "browserslist": [
     "> 1%",
