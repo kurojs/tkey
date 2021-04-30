@@ -197,7 +197,7 @@ export default {
         aggregateLoginParams: AGGREGATE_LOGIN,
       });
 
-      await this.tkey.storageLayer.setMetadata({input: "", serviceProvider: this.tkey.serviceProvider})
+      await this.tkey.storageLayer.setMetadata({input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider})
     },
     async login() {
       if (this.isMocked) return;
