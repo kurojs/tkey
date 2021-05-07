@@ -56,7 +56,7 @@ const AGGREGATE_LOGIN = {
   verifierIdentifier: "binance-google",
   subVerifierDetailsArray: [
     {
-      clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
+      clientId: "467606163324-fli122op7hro9uism3ug66vfnfvnpnjt.apps.googleusercontent.com",
       typeOfLogin: "google",
       verifier: "torus"
     }
@@ -187,10 +187,21 @@ export default {
       try {
         // const jwtParams = this.loginConnections[this.selectedVerifier] || {};
         const { typeOfLogin, clientId, verifier } = this.verifiers[this.selectedVerifier];
-      
-        await this.tKey.serviceProvider.triggerAggregateLogin(AGGREGATE_LOGIN);
+    
+        await this.tKey.serviceProvider.triggerAggregateLogin({
+          aggregateVerifierType: 'single_id_verifier',
+          verifierIdentifier: "binance-google",
+          subVerifierDetailsArray: [
+            {
+              typeOfLogin: "google",
+              verifier: "binance",
+              clientId: '467606163324-fli122op7hro9uism3ug66vfnfvnpnjt.apps.googleusercontent.com',
+            },
+          ],
+        });
 
-        await this.tkey.storageLayer.setMetadata({ input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider });
+        await this.tKey.storageLayer.setMetadata({ input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tKey.serviceProvider });
+        console.log("service provider share reset done")
       } catch (err) {
         console.log(err);
       }
