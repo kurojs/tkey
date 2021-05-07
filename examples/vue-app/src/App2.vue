@@ -58,9 +58,9 @@ const AGGREGATE_LOGIN = {
     {
       clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
       typeOfLogin: "google",
-      verifier: "torus",
-    },
-  ],
+      verifier: "torus"
+    }
+  ]
 };
 // const AGGREGATE_LOGIN = {
 //   aggregateVerifierType: "single_id_verifier",
@@ -84,11 +84,11 @@ export default {
       selectedVerifier: "google",
       verifiers: {
         [GOOGLE]: {
-          name: 'google',
-          typeOfLogin: 'google',
-          clientId: '467606163324-fli122op7hro9uism3ug66vfnfvnpnjt.apps.googleusercontent.com',
-          verifier: 'binance',
-          verifierIdentifier: 'binance-google',
+          name: "google",
+          typeOfLogin: "google",
+          clientId: "467606163324-fli122op7hro9uism3ug66vfnfvnpnjt.apps.googleusercontent.com",
+          verifier: "binance",
+          verifierIdentifier: "binance-google"
         },
         // [GOOGLE]: {
         //   name: "Google",
@@ -104,13 +104,13 @@ export default {
           name: "Email Password",
           typeOfLogin: "email_password",
           clientId: "sqKRBVSdwa4WLkaq419U7Bamlh5vK1H7",
-          verifier: "torus-auth0-email-password",
+          verifier: "torus-auth0-email-password"
         },
         [PASSWORDLESS]: {
           name: "Passwordless",
           typeOfLogin: "passwordless",
           clientId: "P7PJuBCXIHP41lcyty0NEb7Lgf7Zme8Q",
-          verifier: "torus-auth0-passwordless",
+          verifier: "torus-auth0-passwordless"
         },
         [APPLE]: { name: "Apple", typeOfLogin: "apple", clientId: "m1Q0gvDfOyZsJCZ3cucSQEe9XMvl9d9L", verifier: "torus-auth0-apple-lrc" },
         [GITHUB]: { name: "Github", typeOfLogin: "github", clientId: "PC2a4tfNRvXbT48t89J5am0oFM21Nxff", verifier: "torus-auth0-github-lrc" },
@@ -122,15 +122,15 @@ export default {
           name: "Hosted Email Passwordless",
           typeOfLogin: "jwt",
           clientId: "P7PJuBCXIHP41lcyty0NEb7Lgf7Zme8Q",
-          verifier: "torus-auth0-passwordless",
+          verifier: "torus-auth0-passwordless"
         },
         [HOSTED_SMS_PASSWORDLESS]: {
           name: "Hosted SMS Passwordless",
           typeOfLogin: "jwt",
           clientId: "nSYBFalV2b1MSg5b2raWqHl63tfH3KQa",
-          verifier: "torus-auth0-sms-passwordless",
-        },
-      },
+          verifier: "torus-auth0-sms-passwordless"
+        }
+      }
     };
   },
   computed: {
@@ -145,14 +145,14 @@ export default {
         [LINKEDIN]: { domain: AUTH_DOMAIN },
         [TWITTER]: { domain: AUTH_DOMAIN },
         [WEIBO]: { domain: AUTH_DOMAIN },
-        [LINE]: { domain: AUTH_DOMAIN },
+        [LINE]: { domain: AUTH_DOMAIN }
       };
-    },
+    }
   },
   watch: {
     async isMocked() {
       await this.init();
-    },
+    }
   },
   methods: {
     async init() {
@@ -164,8 +164,8 @@ export default {
             directParams: {
               baseUrl: `${location.origin}/serviceworker`,
               enableLogging: true,
-              network: "mainnet", // details for test net
-            },
+              network: "mainnet" // details for test net
+            }
           });
       if (!this.isMocked) {
         await serviceProvider.init({ skipSw: false });
@@ -177,27 +177,23 @@ export default {
       this.tKey = new ThresholdKey({
         serviceProvider,
         storageLayer,
-        modules: { webStorage },
+        modules: { webStorage }
       });
     },
-    async resetTkey(){
+    async resetTkey() {
       if (this.isMocked) return;
       if (!this.tKey) return;
 
-      const jwtParams = this.loginConnections[this.selectedVerifier] || {};
-      const { typeOfLogin, clientId, verifier } = this.verifiers[this.selectedVerifier];
+      try {
+        // const jwtParams = this.loginConnections[this.selectedVerifier] || {};
+        const { typeOfLogin, clientId, verifier } = this.verifiers[this.selectedVerifier];
+      
+        await this.tKey.serviceProvider.triggerAggregateLogin(AGGREGATE_LOGIN);
 
-      await this.tKey.serviceProvider.triggerHybridAggregateLogin({
-        singleLogin: {
-          typeOfLogin,
-          verifier,
-          clientId,
-          jwtParams,
-        },
-        aggregateLoginParams: AGGREGATE_LOGIN,
-      });
-
-      await this.tkey.storageLayer.setMetadata({input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider})
+        await this.tkey.storageLayer.setMetadata({ input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider });
+      } catch (err) {
+        console.log(err);
+      }
     },
     async login() {
       if (this.isMocked) return;
@@ -216,7 +212,7 @@ export default {
         aggregateLoginParams: AGGREGATE_LOGIN,
       });
 
-      await this.tkey.storageLayer.setMetadata({input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider})
+      await this.tkey.storageLayer.setMetadata({ input: { message: "KEY_NOT_FOUND" }, serviceProvider: this.tkey.serviceProvider });
     },
     async initializeNewKey() {
       this.console(await this.tKey.initializeNewKey({ initializeModules: true }));
@@ -233,11 +229,11 @@ export default {
     console(output) {
       this.consoleOutput = typeof output === "string" ? output : JSON.stringify(output, null, 2);
       console.log(output);
-    },
+    }
   },
   async mounted() {
     await this.init();
-  },
+  }
 };
 </script>
 
