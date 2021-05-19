@@ -280,8 +280,6 @@ export interface ITKey extends ITKeyApi, ISerializable {
 
   privKey: BN;
 
-  localMetadataTransitions: LocalMetadataTransitions;
-
   manualSync: boolean;
 
   refreshMiddleware: RefreshMiddlewareMap;

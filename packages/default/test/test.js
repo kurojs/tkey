@@ -59,7 +59,6 @@ manualSyncModes.forEach((mode) => {
     it(`#should be able to reconstruct key when initializing a key, manualSync=${mode}`, async function () {
       const resp1 = await tb.initializeNewKey({ initializeModules: true });
       await tb.syncLocalMetadataTransitions();
-
       const tb2 = new ThresholdKey({ serviceProvider: defaultSP, storageLayer: defaultSL, manualSync: mode });
       await tb2.initialize({ neverInitializeNewKey: true });
       tb2.inputShareStore(resp1.deviceShare);
@@ -201,7 +200,7 @@ manualSyncModes.forEach((mode) => {
       userInput = userInput.umod(ecCurve.curve.n);
       const resp1 = await tb.initializeNewKey({ userInput, initializeModules: true });
       const { newShareStores: shareStores, newShareIndex: shareIndex } = await tb.generateNewShare();
-      debugger
+      debugger;
 
       const stringified = JSON.stringify(tb);
       const tb3 = await ThresholdKey.fromJSON(JSON.parse(stringified), { serviceProvider: defaultSP, storageLayer: defaultSL });
@@ -214,7 +213,7 @@ manualSyncModes.forEach((mode) => {
       await tb3.syncLocalMetadataTransitions();
       strictEqual(finalKey.privKey.toString("hex"), resp1.privKey.toString("hex"), "Incorrect serialization");
 
-      debugger
+      debugger;
 
       const tb4 = new ThresholdKey({ serviceProvider: defaultSP, storageLayer: defaultSL, manualSync: mode });
       await tb4.initialize({ input: resp1.userShare });

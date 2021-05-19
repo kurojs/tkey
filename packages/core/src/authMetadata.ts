@@ -19,6 +19,7 @@ class AuthMetadata implements IAuthMetadata {
   toJSON(): StringifiedType {
     const data = this.metadata;
 
+    if (!this.privKey) throw CoreError.default("No private key");
     const k = toPrivKeyEC(this.privKey);
     const sig = k.sign(stripHexPrefix(keccak256(stringify(data))));
 
